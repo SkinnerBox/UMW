@@ -500,12 +500,13 @@
   #include <Device_I2C.h>
 
   // Gyroscope declaration
-  #define ITG3200_ADDRESS_ALTERNATE
+  //#define ITG3200_ADDRESS_ALTERNATE
   //#include <Gyroscope_ITG3200_9DOF.h>
   #include <Gyroscope_L3G4200D.h>
   
   // Accelerometer declaration
   #include <Accelerometer_ADXL345_9DOF.h>
+  //#include <Accelerometer_ADXL345.h>
 
   // Receiver Declaration
   #define RECEIVER_MEGA
@@ -553,7 +554,7 @@
    * Put AeroQuadMega_v21 specific initialization need here
    */
   void initPlatform() {
-
+  /*
     pinMode(LED_Red, OUTPUT);
     digitalWrite(LED_Red, LOW);
     pinMode(LED_Yellow, OUTPUT);
@@ -570,7 +571,7 @@
     digitalWrite(43, HIGH); // LED 1 on
     digitalWrite(44, HIGH); // LED 2 on
     digitalWrite(45, HIGH); // LED 3 on
-    digitalWrite(46, HIGH); // LED 4 on
+    digitalWrite(46, HIGH); // LED 4 on*/
 
     Wire.begin();
     TWBR = 12;
