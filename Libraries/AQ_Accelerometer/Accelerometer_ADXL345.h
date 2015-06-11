@@ -28,34 +28,42 @@
 
 void initializeAccel() {
 
-  if (readWhoI2C(ACCEL_ADDRESS) ==  0xE5) { 			// page 14 of datasheet
-    vehicleState |= ACCEL_DETECTED;
-  }
-	
-  updateRegisterI2C(ACCEL_ADDRESS, 0x2D, 1<<3); 	// set device to *measure*
-  updateRegisterI2C(ACCEL_ADDRESS, 0x31, 0x09);     // set full range and +/- 4G
-  updateRegisterI2C(ACCEL_ADDRESS, 0x2C, 8+2+1);    // 200hz sampling
-  delay(10); 
+  vehicleState |= ACCEL_DETECTED;
+
+  delay(10);
+  writeRegister ( ACCEL_ADDRESS, 0x2D, 1<<3 ); //  register: Power CTRL  -- value: Set measure bit 3 on
+  writeRegister ( ACCEL_ADDRESS, 0x31, 0x0B ); //  register: DATA_FORMAT -- value: Set bits 3(full range) and 1 0 on (+/- 16g-range)
+  writeRegister ( ACCEL_ADDRESS, 0x2C, 0x09 ); //  register: BW_RATE     -- value: rate=50hz, bw=20hz
 }
   
 void measureAccel() {
 
-  sendByteI2C(ACCEL_ADDRESS, 0x32);
-  Wire.requestFrom(ACCEL_ADDRESS, 6);
+    byte msbRegisters[3] = { 0x33, 0x35, 0x37 };
+    byte lsbRegisters[3] = { 0x32, 0x34, 0x36 };
 
-  for (byte axis = XAXIS; axis <= ZAXIS; axis++) {
-    meterPerSecSec[axis] = readReverseShortI2C() * accelScaleFactor[axis] + runTimeAccelBias[axis];
-  }
+    //read the x, y, and z values from the IMU's registers
+    for (byte axis = XAXIS, lsb=0, msb=0; axis <= ZAXIS; axis++) 
+    {
+      msb = readRegister(ACCEL_ADDRESS, msbRegisters[axis] );
+      lsb = readRegister(ACCEL_ADDRESS, lsbRegisters[axis] );
+      meterPerSecSec[axis] = ((msb << 8) | lsb);
+    }
+
 }
 
 void measureAccelSum() {
 
-  sendByteI2C(ACCEL_ADDRESS, 0x32);
-  Wire.requestFrom(ACCEL_ADDRESS, 6);
-  for (byte axis = XAXIS; axis <= ZAXIS; axis++) {
-    accelSample[axis] += readReverseShortI2C();
-  }
-  accelSampleCount++;
+    byte msbRegisters[3] = { 0x33, 0x35, 0x37 };
+    byte lsbRegisters[3] = { 0x32, 0x34, 0x36 };
+
+    //read the x, y, and z values from the IMU's registers
+    for (byte axis = XAXIS, lsb=0, msb=0; axis <= ZAXIS; axis++) 
+    {
+      msb = readRegister(ACCEL_ADDRESS, msbRegisters[axis] );
+      lsb = readRegister(ACCEL_ADDRESS, lsbRegisters[axis] );
+      accelSample[axis] += ((msb << 8) | lsb);
+    }
+    accelSampleCount++;
 }
 
 void evaluateMetersPerSec() {

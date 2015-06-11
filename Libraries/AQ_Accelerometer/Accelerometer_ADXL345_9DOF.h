@@ -33,7 +33,7 @@ void initializeAccel() {
   }
 	
   updateRegisterI2C(ACCEL_ADDRESS, 0x2D, 1<<3);     // set device to *measure*
-  updateRegisterI2C(ACCEL_ADDRESS, 0x31, 0x09);     // set full range and +/- 4G
+  updateRegisterI2C(ACCEL_ADDRESS, 0x31, 0x0B);     // set full range and +/- 4G
   updateRegisterI2C(ACCEL_ADDRESS, 0x2C, 8+2+1);    // 200hz sampling
   delay(10); 
 }

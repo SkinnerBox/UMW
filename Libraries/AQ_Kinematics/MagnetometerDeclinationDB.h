@@ -178,7 +178,7 @@ int16_t getLookupValue(uint8_t x, uint8_t y) {
 	  i++) {
 
     // Pull out the row_value struct
-    memcpy_P((void*) &stval, (const prog_char *)&declination_values[i], sizeof(struct row_value));
+    memcpy_P((void*) &stval, (const char *)&declination_values[i], sizeof(struct row_value));
 
     // Pull the first offset and determine sign
     int16_t offset = stval.abs_offset;
