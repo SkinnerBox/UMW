@@ -111,7 +111,7 @@ void initializeGyro() {
   }else
   {
     writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00110000);
-    gyroScaleFactor = radians(1.0 / 70);
+    gyroScaleFactor = radians(-1.0 / 20);
   }
 
   // CTRL_REG5 controls high-pass filtering of outputs, use it
@@ -127,8 +127,11 @@ void initializeGyro() {
 void readGyroRaw(int *gyroRaw) 
 {
 
-    byte msbRegisters[3] = { 0x29, 0x2B, 0x2D };
-    byte lsbRegisters[3] = { 0x28, 0x2A, 0x2C };
+    //byte msbRegisters[3] = { 0x29, 0x2B, 0x2D };
+    //byte lsbRegisters[3] = { 0x28, 0x2A, 0x2C };
+	
+	byte msbRegisters[3] = { 0x2B, 0x29, 0x2D };
+    byte lsbRegisters[3] = { 0x2A, 0x28, 0x2C };
 
     //read the x, y, and z values from the IMU's registers
     for (byte axis = XAXIS, lsb=0, msb=0; axis <= ZAXIS; axis++) 
