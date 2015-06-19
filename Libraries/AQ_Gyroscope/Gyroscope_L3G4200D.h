@@ -1,25 +1,3 @@
-
-Skip to content
-This repository
-
-    Pull requests
-    Issues
-    Gist
-
-    @SkinnerBox
-
-2
-0
-
-    0
-
-SkinnerBox/UMW
-
-UMW/Libraries/AQ_Gyroscope/Gyroscope_L3G4200D.h
-@SkinnerBox SkinnerBox 44 minutes ago Wersja jako tako działająca z Parady Robotów - dzień pierwszy.
-
-1 contributor
-217 lines (157 sloc) 5.864 kB
 /*  AeroQuad v3.0.1 - June 2012
   www.AeroQuad.com
   Copyright (c) 2012 Ted Carancho.  All rights reserved.
@@ -47,7 +25,7 @@ UMW/Libraries/AQ_Gyroscope/Gyroscope_L3G4200D.h
 #include <SensorsStatus.h>
 #include <Wire.h>
 
-#define GYRO_CALIBRATION_TRESHOLD 4
+#define GYRO_CALIBRATION_TRESHOLD 25
 
 #define GYRO_ADDRESS 105
 
@@ -128,7 +106,7 @@ void initializeGyro() {
   {
     writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00110000);
     //gyroScaleFactor = radians(-1.0 / 20);
-	gyroScaleFactor = radians(-0.07);
+	gyroScaleFactor = radians(0.07);
   }
 
   // CTRL_REG5 controls high-pass filtering of outputs, use it
@@ -208,7 +186,7 @@ void evaluateGyroRate() {
 
 boolean calibrateGyro() {
 
-  int gyro_address = 0XD2;
+  int gyro_address = 0XD2; // czy dobry adres?
   int findZero[FINDZERO];
   int diff = 0; 
   for (byte axis = XAXIS; axis <= ZAXIS; axis++) {
@@ -231,8 +209,3 @@ boolean calibrateGyro() {
 
 
 #endif
-
-    Status API Training Shop Blog About Help 
-
-    © 2015 GitHub, Inc. Terms Privacy Security Contact 
-
