@@ -111,7 +111,8 @@ void initializeGyro() {
   }else
   {
     writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00110000);
-    gyroScaleFactor = radians(-1.0 / 20);
+    //gyroScaleFactor = radians(-1.0 / 20);
+	gyroScaleFactor = radians(-0.07);
   }
 
   // CTRL_REG5 controls high-pass filtering of outputs, use it
