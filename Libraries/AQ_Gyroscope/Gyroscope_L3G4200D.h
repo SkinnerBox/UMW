@@ -1,3 +1,25 @@
+
+Skip to content
+This repository
+
+    Pull requests
+    Issues
+    Gist
+
+    @SkinnerBox
+
+2
+0
+
+    0
+
+SkinnerBox/UMW
+
+UMW/Libraries/AQ_Gyroscope/Gyroscope_L3G4200D.h
+@SkinnerBox SkinnerBox 44 minutes ago Wersja jako tako działająca z Parady Robotów - dzień pierwszy.
+
+1 contributor
+217 lines (157 sloc) 5.864 kB
 /*  AeroQuad v3.0.1 - June 2012
   www.AeroQuad.com
   Copyright (c) 2012 Ted Carancho.  All rights reserved.
@@ -7,18 +29,12 @@
   it under the terms of the GNU General Public License as published by 
   the Free Software Foundation, either version 3 of the License, or 
   (at your option) any later version. 
-
-
   This program is distributed in the hope that it will be useful, 
   but WITHOUT ANY WARRANTY; without even the implied warranty of 
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
   GNU General Public License for more details. 
-
-
   You should have received a copy of the GNU General Public License 
   along with this program. If not, see <http://www.gnu.org/licenses/>. 
-
-
   Implemented by Lars Karlslund
 */
 
@@ -31,12 +47,13 @@
 #include <SensorsStatus.h>
 #include <Wire.h>
 
-#define GYRO_CALIBRATION_TRESHOLD 8
+#define GYRO_CALIBRATION_TRESHOLD 4
 
 #define GYRO_ADDRESS 105
 
 
 #define GYRO_RATE 2000
+//#define GYRO_RATE 1000
 //#define GYRO_RATE 500
 
 
@@ -47,9 +64,9 @@
 #define GYRO_CTRL_REG5 0x24
 
 // Axis inversion: -1 = invert, 1 = don't invert
-int gyroAxisInversionFactor[3] = {1,-1,-1};
+int gyroAxisInversionFactor[3] = {1,1,1};
 
-/*
+
 void writeRegister(int deviceAddress, byte address, byte val) {
     Wire.beginTransmission(deviceAddress); // start transmission to device 
     Wire.write(address);       // send register address
@@ -72,40 +89,41 @@ int readRegister(int deviceAddress, byte address){
 
     v = Wire.read();
     return v;
-}*/
+}
 
 void initializeGyro() {
+
+
   // Found at http://bildr.org/2011/06/l3g4200d-arduino/
-  //vehicleState |= GYRO_DETECTED;
-  sendByteI2C(GYRO_ADDRESS, 0x0f);
-  if (readByteI2C(GYRO_ADDRESS) == 0b11010011) {
-    vehicleState |= GYRO_DETECTED;
-  }
+  vehicleState |= GYRO_DETECTED;
+
+  #define CTRL_REG1 0x20
+  #define CTRL_REG2 0x21
+  #define CTRL_REG3 0x22
+  #define CTRL_REG4 0x23
+  #define CTRL_REG5 0x24
 
   // Enable x, y, z and turn off power down:
-  //writeRegister(GYRO_ADDRESS, CTRL_REG1, 0b00001111);
-	updateRegisterI2C(GYRO_ADDRESS, GYRO_CTRL_REG1, 0b10011111);
-	delay(5);
+  writeRegister(GYRO_ADDRESS, CTRL_REG1, 0b00001111);
+
   // If you'd like to adjust/use the HPF, you can edit the line below to configure CTRL_REG2:
-  //writeRegister(GYRO_ADDRESS, GYRO_CTRL_REG2, 0b00000000);
+  writeRegister(GYRO_ADDRESS, CTRL_REG2, 0b00000000);
 
   // Configure CTRL_REG3 to generate data ready interrupt on INT2
   // No interrupts used on INT1, if you'd like to configure INT1
   // or INT2 otherwise, consult the datasheet:
-  //writeRegister(GYRO_ADDRESS, GYRO_CTRL_REG3, 0b00001000);
+  writeRegister(GYRO_ADDRESS, CTRL_REG3, 0b00001000);
 
   // CTRL_REG4 controls the full-scale range, among other things:
 
   if(GYRO_RATE == 250){
-    updateRegisterI2C(GYRO_ADDRESS, GYRO_CTRL_REG4, 0b10000000);
-    //gyroScaleFactor = radians(1.0 / 10);
-	gyroScaleFactor = radians(0.00875);
+    writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00000000);
+    gyroScaleFactor = radians(1.0 / 10);
   }
   else if(GYRO_RATE == 500)
   {
-    updateRegisterI2C(GYRO_ADDRESS, GYRO_CTRL_REG4, 0b10010000);
-    //gyroScaleFactor = radians(1.0 / 17.5);
-	gyroScaleFactor = radians(0.0175);
+    writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00010000);
+    gyroScaleFactor = radians(1.0 / 17.5);
   }else
   {
     writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00110000);
@@ -115,13 +133,8 @@ void initializeGyro() {
 
   // CTRL_REG5 controls high-pass filtering of outputs, use it
   // if you'd like:
-  //writeRegister(GYRO_ADDRESS, CTRL_REG5, 0b00000010);
-  
-	delay(5);
-  // High pass filter enabled 
-  updateRegisterI2C(GYRO_ADDRESS, GYRO_CTRL_REG5, 0b00000010);
+  writeRegister(GYRO_ADDRESS, CTRL_REG5, 0b00000000);
 
-  delay(10); 
 
 }
   
@@ -130,14 +143,7 @@ void initializeGyro() {
 // Read raw values from sensor (inverted if required)
 void readGyroRaw(int *gyroRaw) 
 {
-    sendByteI2C(GYRO_ADDRESS, 0x80 | 0x28); // 0x80 autoincrement from 0x28 register
-    Wire.requestFrom(GYRO_ADDRESS,6);
-    
-    for (byte axis = XAXIS; axis <= ZAXIS; axis++) {
-        gyroRaw[axis] = gyroAxisInversionFactor[axis] * readReverseShortI2C();
-    }
-	
-/*
+
     //byte msbRegisters[3] = { 0x29, 0x2B, 0x2D };
     //byte lsbRegisters[3] = { 0x28, 0x2A, 0x2C };
 	
@@ -151,7 +157,7 @@ void readGyroRaw(int *gyroRaw)
       lsb = gyroAxisInversionFactor[axis] * readRegister(105, lsbRegisters[axis] );
       gyroRaw[axis] = ((msb << 8) | lsb);
     }
-	*/
+
 }
 
 void measureGyro() {
@@ -225,3 +231,8 @@ boolean calibrateGyro() {
 
 
 #endif
+
+    Status API Training Shop Blog About Help 
+
+    © 2015 GitHub, Inc. Terms Privacy Security Contact 
+
