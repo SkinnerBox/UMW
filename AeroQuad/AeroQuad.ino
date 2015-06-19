@@ -505,8 +505,8 @@
   #include <Gyroscope_L3G4200D.h>
   
   // Accelerometer declaration
+  //#include <Accelerometer_ADXL345_9DOF.h>
   #include <Accelerometer_ADXL345_9DOF.h>
-  //#include <Accelerometer_ADXL345.h>
 
   // Receiver Declaration
   #define RECEIVER_MEGA
@@ -515,10 +515,17 @@
   #define MOTOR_PWM_Timer
 
   // heading mag hold declaration
+  /*
   #ifdef HeadingMagHold
     #include <Compass.h>
     #define SPARKFUN_9DOF_5883L
   #endif
+  */
+  #ifdef HeadingMagHold
+    #include <Compass.h>
+    #define HMC5843
+  #endif
+  
 
   // Altitude declaration
   #ifdef AltitudeHoldBaro
@@ -538,6 +545,7 @@
     #endif
   #else
     #undef BattMonitorAutoDescent
+    #undef BattCellCount
     #undef POWERED_BY_VIN        
   #endif
 
@@ -574,7 +582,7 @@
     digitalWrite(46, HIGH); // LED 4 on*/
 
     Wire.begin();
-    TWBR = 12;
+    //TWBR = 12;
   }
   
   // called when eeprom is initialized
@@ -593,10 +601,16 @@
   /**
    * Measure critical sensors
    */
-  void measureCriticalSensors() {
+   void measureCriticalSensors() {
+    if (deltaTime >= 10000) {
+      measureGyro();
+      measureAccelSum();
+    }
+   }
+  /*void measureCriticalSensors() {
     measureGyroSum();
     measureAccelSum();
-  }
+  }*/
 #endif
 
 #ifdef ArduCopter
