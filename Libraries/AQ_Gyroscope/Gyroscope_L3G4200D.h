@@ -25,7 +25,7 @@
 #include <SensorsStatus.h>
 #include <Wire.h>
 
-#define GYRO_CALIBRATION_TRESHOLD 25
+#define GYRO_CALIBRATION_TRESHOLD 4
 
 #define GYRO_ADDRESS 105
 
@@ -106,12 +106,12 @@ void initializeGyro() {
   {
     writeRegister(GYRO_ADDRESS, CTRL_REG4, 0b00110000);
     //gyroScaleFactor = radians(-1.0 / 20);
-	gyroScaleFactor = radians(0.07);
+	gyroScaleFactor = radians(-0.07);
   }
 
   // CTRL_REG5 controls high-pass filtering of outputs, use it
   // if you'd like:
-  writeRegister(GYRO_ADDRESS, CTRL_REG5, 0b00000000);
+  writeRegister(GYRO_ADDRESS, CTRL_REG5, 0b00000010);
 
 
 }
